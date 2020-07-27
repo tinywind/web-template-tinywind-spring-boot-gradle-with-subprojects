@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.tinywind.server.repository.UserRepository">
+    <select id="find" resultType="User" parameterType="UserSearch">
+        SELECT *
+        FROM "user"
+        <where>
+            <if test="loginId != null and loginId != ''">
+                AND "login_id" LIKE '%' || #{loginId} || '%'
+            </if>
+        </where>
+    </select>
+
+    <sql id="find">
+        SELECT *
+        FROM "user"
+        <where>
+            <if test="loginId != null and loginId != ''">
+                AND "login_id" LIKE '%' || #{loginId} || '%'
+            </if>
+        </where>
+    </sql>
+
+    <select id="search" resultType="User" parameterType="UserSearch">
+        <include refid="u.pagingBefore"/>
+        <include refid="find"/>
+        <include refid="u.pagingAfter"/>
+    </select>
+
+    <select id="count" resultType="int" parameterType="UserSearch">
+        <include refid="u.countingBefore"/>
+        <include refid="find"/>
+        <include refid="u.countingAfter"/>
+    </select>
+
+    <select id="findAll" resultType="User">
+        SELECT *
+        FROM "user"
+    </select>
+
+    <select id="findOne" resultType="User" parameterType="uuid">
+        SELECT *
+        FROM "user"
+        WHERE "id" = #{id}
+    </select>
+
+    <select id="findOneByLoginId" resultType="User" parameterType="string">
+        SELECT *
+        FROM "user"
+        WHERE "login_id" = #{loginId}
+    </select>
+
+    <insert id="insert">
+        INSERT INTO "user" ("id", "grade", "login_id", "password", "name", "phone", "phone2", "email", "blackout", "comment")
+        VALUES (#{id}, #{grade}, #{loginId}, #{password}, #{name}, #{phone}, #{phone2}, #{email}, #{blackout}, #{comment})
+        <selectKey order="BEFORE" keyProperty="id" resultType="uuid">SELECT sys_guid() FROM DUAL</selectKey>
+    </insert>
+
+    <update id="update">
+        UPDATE "user"
+        SET "login_id" = #{loginId},
+            "password" = #{password}
+        WHERE "id" = #{id}
+    </update>
+
+    <delete id="delete">
+        DELETE
+        FROM "user"
+        WHERE "id" = #{value}
+    </delete>
+</mapper>

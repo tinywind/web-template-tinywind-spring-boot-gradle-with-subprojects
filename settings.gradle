@@ -1,0 +1,6 @@
+rootProject.name = 'spring-boot-gradle-with-subprojects'
+
+include 'meta'
+include 'common-spring'
+include 'spring-error-notifier'
+include 'webapp'

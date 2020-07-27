@@ -1,0 +1,74 @@
+server:
+  port: 20001
+  servlet:
+    session:
+      timeout: 10h
+spring:
+  application:
+    name: front
+  messages:
+    basename: classpath:messages
+    encoding: UTF-8
+  mvc:
+    view:
+      prefix: /WEB-INF/jsp/
+      suffix: .jsp
+  devtools:
+    livereload:
+      enabled: false
+    restart:
+      enabled: false
+  servlet:
+    multipart:
+      file-size-threshold: 1MB
+      max-request-size: 100MB
+      max-file-size: 100MB
+  mail:
+    host:
+    port:
+    username:
+    password:
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+management:
+  metrics:
+    tags:
+      application: ${spring.application.name}-metrics
+  endpoints:
+    web:
+      exposure:
+        include: "health, info, prometheus"
+# spring-error-notifier 설정
+application:
+  log:
+    level: ERROR
+    service: ${spring.application.name}
+    endpoint_url: http://localhost:8082/endpoint
+# 정의 설정
+user-data:
+  mail:
+    from:
+  application:
+    version: 0.1
+    debugging: true
+    swagger:
+      api-package: org.tinywind.server.controller.api
+    file:
+      location: ./files
+  datasource:
+    #    jdbc-url: jdbc:oracle:thin:@localhost:1521:orcl
+    jdbc-url: jdbc:log4jdbc:oracle:thin:@localhost:1521:orcl
+    #    driver-class-name: oracle.jdbc.OracleDriver
+    driver-class-name: net.sf.log4jdbc.sql.jdbcapi.DriverSpy
+    username: database_username
+    password: database_password
+# 두번째 datasource가 적용되는지 확인
+    secondary:
+      jdbc-url: ${user-data.datasource.jdbc-url}
+      driver-class-name: ${user-data.datasource.driver-class-name}
+      username: ${user-data.datasource.username}
+      password: ${user-data.datasource.password}

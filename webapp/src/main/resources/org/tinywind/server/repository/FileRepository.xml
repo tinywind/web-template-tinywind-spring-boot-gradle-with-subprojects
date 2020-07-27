@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.tinywind.server.repository.FileRepository">
+    <select id="findAll" resultType="File">
+        SELECT *
+        FROM "file"
+    </select>
+
+    <select id="findOne" resultType="File" parameterType="uuid">
+        SELECT *
+        FROM "file"
+        WHERE "id" = #{value}
+    </select>
+
+    <insert id="insert">
+        INSERT INTO "file" ("id", "original_name", "path", "size")
+        VALUES (#{id}, #{originalName}, #{path}, #{size})
+        <selectKey order="BEFORE" keyProperty="id" resultType="uuid">SELECT sys_guid() FROM DUAL</selectKey>
+    </insert>
+</mapper>

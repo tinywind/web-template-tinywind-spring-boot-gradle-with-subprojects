@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="u">
+    <sql id="pagingBefore">
+        SELECT ROWNUM, "__seed".*
+        FROM (
+    </sql>
+    <sql id="pagingAfter">
+        ) "__seed"
+        <where>
+            <if test="page != null and limit != null">
+                AND ROWNUM >= ${(page - 1) * limit}
+                AND ${(page) * limit} > ROWNUM
+            </if>
+        </where>
+    </sql>
+
+    <sql id="countingBefore">
+        SELECT count(*)
+        FROM (
+    </sql>
+    <sql id="countingAfter">
+        ) "__seed"
+    </sql>
+</mapper>
