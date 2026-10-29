@@ -339,6 +339,11 @@
 
         const emptynull = $(this).attr('data-emptynull') === "true";
 
+        function isContainer(value) {
+            return value !== null && typeof value === 'object' &&
+                (Array.isArray(value) || Object.getPrototypeOf(value) === Object.prototype);
+        }
+
         function set(name, multiple, value) {
             const members = name.split('.');
             if (members.some(member => member.split(/[\[\]]/).some(key =>
@@ -348,27 +353,38 @@
             }
 
             for (let target = data, i = 0; i < members.length; i++) {
+                if (!isContainer(target)) return;
                 const last = i === members.length - 1;
                 const member = members[i];
                 const checkMap = /([0-9a-zA-Z_]+)\[([^\]]+)]/.exec(member);
                 if (checkMap) {
                     const key = checkMap[1];
                     const attr = checkMap[2];
+                    if (key === '__proto__' || key === 'constructor' || key === 'prototype' ||
+                        attr === '__proto__' || attr === 'constructor' || attr === 'prototype') {
+                        deferred.reject(new Error('Invalid form field name'));
+                        return;
+                    }
                     if (!Object.prototype.hasOwnProperty.call(target, key)) target[key] = {};
+                    if (!isContainer(target[key])) return;
                     target = target[key];
                     if (last) {
-                        if (multiple) if (!target[attr]) target[attr] = [];
-                        if (multiple) target[attr].push(value);
-                        else target[attr] = value;
+                        if (multiple) {
+                            if (!Object.prototype.hasOwnProperty.call(target, attr)) target[attr] = [];
+                            if (!Array.isArray(target[attr])) return;
+                            target[attr].push(value);
+                        } else target[attr] = value;
                     } else {
                         if (!Object.prototype.hasOwnProperty.call(target, attr)) target[attr] = {};
                         target = target[attr];
                     }
                 } else {
                     if (last) {
-                        if (multiple) if (!target[member]) target[member] = [];
-                        if (multiple) target[member].push(value);
-                        else target[member] = value;
+                        if (multiple) {
+                            if (!Object.prototype.hasOwnProperty.call(target, member)) target[member] = [];
+                            if (!Array.isArray(target[member])) return;
+                            target[member].push(value);
+                        } else target[member] = value;
                     } else {
                         if (!Object.prototype.hasOwnProperty.call(target, member)) target[member] = {};
                         target = target[member];
