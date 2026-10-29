@@ -335,7 +335,7 @@
     $.fn.asJsonData = function () {
         const deferred = jQuery.Deferred();
         const data = {};
-        const files = {};
+        const files = Object.create(null);
 
         const emptynull = $(this).attr('data-emptynull') === "true";
 
@@ -356,6 +356,10 @@
                 if (!isContainer(target)) return;
                 const last = i === members.length - 1;
                 const member = members[i];
+                if (member === '__proto__' || member === 'constructor' || member === 'prototype') {
+                    deferred.reject(new Error('Invalid form field name'));
+                    return;
+                }
                 const checkMap = /([0-9a-zA-Z_]+)\[([^\]]+)]/.exec(member);
                 if (checkMap) {
                     const key = checkMap[1];
@@ -395,7 +399,7 @@
 
         function convertFileToData() {
             for (let name in files) {
-                if (files.hasOwnProperty(name)) {
+                if (Object.prototype.hasOwnProperty.call(files, name)) {
                     let file = files[name];
                     if (file instanceof Array) {
                         if (!file.length) {
