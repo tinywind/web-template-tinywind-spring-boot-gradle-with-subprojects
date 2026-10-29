@@ -112,7 +112,7 @@ project(':webapp') {
         implementation 'org.apache.poi:poi:5.5.1'
         implementation 'org.apache.poi:poi-ooxml:5.5.1'
         implementation 'org.webjars:jquery:3.7.1'
-        implementation 'org.webjars:jquery-blockui:2.65'
+        implementation 'org.webjars:jquery-blockui:2.70-1'
         implementation 'org.webjars:momentjs:2.31.0'
         implementation 'org.webjars:d3js:5.16.0'
         implementation 'org.webjars.bower:less.js:2.7.3'
