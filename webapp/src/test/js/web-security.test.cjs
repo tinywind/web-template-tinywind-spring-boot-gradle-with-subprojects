@@ -12,7 +12,7 @@ function page(script) {
     return {dom, $};
 }
 
-for (const field of ['__proto__.polluted', 'constructor.prototype.polluted', 'user[__proto__].polluted', 'user[constructor].prototype.polluted']) {
+for (const field of ['__proto__.polluted', 'constructor.prototype.polluted', 'user[__proto__].polluted', 'user[constructor].prototype.polluted', 'user.!__proto__[label].value']) {
     test('form serialization blocks ' + field, async () => {
         const {dom, $} = page('jquery.ex.js');
         try {
@@ -37,6 +37,52 @@ test('form serialization preserves nested maps and repeated fields', async () =>
         );
         assert.equal(JSON.stringify(await Promise.resolve(form.asJsonData())),
             JSON.stringify({user: {name: 'Alice'}, labels: {en: 'Name'}, tags: ['a', 'b']}));
+    } finally { dom.window.close(); }
+});
+
+for (const path of ['user.toString.label', 'user[toString].label', 'user.name', 'user[name].label']) {
+    test('form serialization skips scalar traversal in ' + path, async () => {
+        const {dom, $} = page('jquery.ex.js');
+        const builtins = [dom.window.Object.prototype, dom.window.String.prototype,
+            dom.window.String.prototype.toString, dom.window.Array.prototype];
+        const properties = builtins.map(value => Object.getOwnPropertyNames(value));
+        try {
+            const form = $('<form>').append(
+                $('<input>', {name: 'user', value: 'Alice'}),
+                $('<input>', {name: path, value: 'label'}),
+                $('<input>', {name: 'title', value: 'Report'})
+            );
+            const result = await Promise.resolve(form.asJsonData());
+            assert.equal(JSON.stringify(result), JSON.stringify({user: 'Alice', title: 'Report'}));
+            for (let i = 0; i < builtins.length; i++) {
+                assert.deepEqual(Object.getOwnPropertyNames(builtins[i]), properties[i]);
+            }
+        } finally { dom.window.close(); }
+    });
+}
+
+test('form serialization creates own arrays for repeated inherited property names', async () => {
+    const {dom, $} = page('jquery.ex.js');
+    try {
+        const form = $('<form>').append(
+            $('<input>', {name: 'toString', value: 'a', 'data-multiple': 'true'}),
+            $('<input>', {name: 'toString', value: 'b', 'data-multiple': 'true'}),
+            $('<input>', {name: 'labels[toString]', value: 'c', 'data-multiple': 'true'}),
+            $('<input>', {name: 'labels[toString]', value: 'd', 'data-multiple': 'true'})
+        );
+        assert.equal(JSON.stringify(await Promise.resolve(form.asJsonData())),
+            JSON.stringify({toString: ['a', 'b'], labels: {toString: ['c', 'd']}}));
+    } finally { dom.window.close(); }
+});
+
+test('form serialization skips repeated fields that conflict with a scalar', async () => {
+    const {dom, $} = page('jquery.ex.js');
+    try {
+        const form = $('<form>').append(
+            $('<input>', {name: 'tags', value: 'first'}),
+            $('<input>', {name: 'tags', value: 'second', 'data-multiple': 'true'})
+        );
+        assert.equal(JSON.stringify(await Promise.resolve(form.asJsonData())), JSON.stringify({tags: 'first'}));
     } finally { dom.window.close(); }
 });
 
