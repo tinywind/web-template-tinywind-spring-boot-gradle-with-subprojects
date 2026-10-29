@@ -114,7 +114,7 @@ project(':webapp') {
         implementation 'org.webjars:jquery:3.7.1'
         implementation 'org.webjars:jquery-blockui:2.65'
         implementation 'org.webjars:momentjs:2.31.0'
-        implementation 'org.webjars:d3js:5.16.0'
+        implementation 'org.webjars:d3js:6.7.0'
         implementation 'org.webjars.bower:less.js:2.7.3'
         implementation 'org.webjars:jquery-ui:1.14.2'
         implementation 'org.bgee.log4jdbc-log4j2:log4jdbc-log4j2-jdbc4.1:1.16'
