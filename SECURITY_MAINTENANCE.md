@@ -1,6 +1,6 @@
 # Runtime and security maintenance
 
-Build with JDK 17 and `./gradlew test :webapp:bootWar`. Run the browser helper regression tests with `npm ci` and `npm test`. Gradle output and test fixtures are under `.tmp/`.
+Build with JDK 17 and `./gradlew test :webapp:bootWar` before running `npm ci --ignore-scripts` and `npm test`. The dependency compatibility browser tests read D3 and BlockUI directly from the produced WAR through a test-only JDK ZIP reader. They fail if the WAR or compiled reader is missing. Gradle output and test fixtures are under `.tmp/`.
 
 The four subprojects remain separate. The supported runtime uses Spring Boot 4.1, Spring Framework 7, Tomcat 11 and Jakarta Servlet APIs. Java package consumers must migrate servlet, validation, annotation and mail imports from `javax` to `jakarta`. JDBC's `javax.sql` package remains unchanged. Jackson 2 is retained for the existing JSON envelope and Vavr data types; Spring's Jackson 2 converter is deprecated and will need replacement before a future Spring major upgrade.
 

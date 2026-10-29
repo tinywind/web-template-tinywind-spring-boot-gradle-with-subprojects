@@ -46,7 +46,7 @@ class ApplicationCompatibilityTest extends AbstractApiControllerTest {
         var login = get(client, "/");
         assertEquals(200, login.statusCode(), login.body());
         assertTrue(login.body().contains("/webjars/jquery/3.7.1/jquery.min.js"));
-        for (String path : new String[]{"/webjars/jquery/3.7.1/jquery.min.js", "/webjars/momentjs/2.31.0/moment.min.js", "/webjars/d3js/5.16.0/d3.min.js", "/webjars/jquery-ui/1.14.2/jquery-ui.min.js", "/actuator/health"}) {
+        for (String path : new String[]{"/webjars/jquery/3.7.1/jquery.min.js", "/webjars/momentjs/2.31.0/moment.min.js", "/webjars/d3js/6.7.0/d3.min.js", "/webjars/jquery-blockui/2.70/jquery.blockUI.js", "/webjars/jquery-ui/1.14.2/jquery-ui.min.js", "/actuator/health"}) {
             assertEquals(200, get(client, path).statusCode(), path);
         }
         var docs = get(client, "/v3/api-docs/application");

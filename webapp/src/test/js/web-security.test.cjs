@@ -4,11 +4,13 @@ const {readFileSync} = require('node:fs');
 const {JSDOM} = require('jsdom');
 const jquery = require('jquery');
 
-function page(script) {
+function page(...scripts) {
     const dom = new JSDOM('<!doctype html><body></body>', {runScripts: 'outside-only'});
     const $ = jquery(dom.window);
     dom.window.jQuery = $;
-    dom.window.eval(readFileSync('webapp/src/main/webapp/resources/js/' + script, 'utf8'));
+    for (const script of scripts) {
+        dom.window.eval(readFileSync('webapp/src/main/webapp/resources/js/' + script, 'utf8'));
+    }
     return {dom, $};
 }
 
@@ -84,6 +86,50 @@ test('form serialization skips repeated fields that conflict with a scalar', asy
         );
         assert.equal(JSON.stringify(await Promise.resolve(form.asJsonData())), JSON.stringify({tags: 'first'}));
     } finally { dom.window.close(); }
+});
+
+for (const name of ['report', 'hasOwnProperty']) {
+    test('form file serialization preserves the field ' + name, async () => {
+        const {dom, $} = page('common.func.js', 'jquery.ex.js');
+        try {
+            const input = $('<input>', {type: 'file', name});
+            Object.defineProperty(input[0], 'files', {
+                value: [new dom.window.File(['report'], 'report.txt', {type: 'text/plain'})]
+            });
+            const form = $('<form>').append(input);
+            const result = await Promise.resolve(form.asJsonData());
+            assert.equal(JSON.stringify(result), JSON.stringify({[name]: {
+                data: Buffer.from('report').toString('base64'), fileName: 'report.txt'
+            }}));
+        } finally { dom.window.close(); }
+    });
+}
+
+test('form file serialization preserves repeated selected files', async () => {
+    const {dom, $} = page('common.func.js', 'jquery.ex.js');
+    try {
+        const input = $('<input>', {type: 'file', name: 'reports', multiple: 'multiple'});
+        Object.defineProperty(input[0], 'files', {value: [
+            new dom.window.File(['first'], 'first.txt', {type: 'text/plain'}),
+            new dom.window.File(['second'], 'second.txt', {type: 'text/plain'})
+        ]});
+        const result = await Promise.resolve($('<form>').append(input).asJsonData());
+        assert.equal(JSON.stringify(result), JSON.stringify({reports: [
+            {data: Buffer.from('first').toString('base64'), fileName: 'first.txt'},
+            {data: Buffer.from('second').toString('base64'), fileName: 'second.txt'}
+        ]}));
+    } finally { dom.window.close(); }
+});
+
+test('form file serialization rejects an unsafe field name', {timeout: 3000}, async context => {
+    const {dom, $} = page('common.func.js', 'jquery.ex.js');
+    context.after(() => dom.window.close());
+    const input = $('<input>', {type: 'file', name: '__proto__'});
+    Object.defineProperty(input[0], 'files', {
+        value: [new dom.window.File(['report'], 'report.txt', {type: 'text/plain'})]
+    });
+    await assert.rejects(Promise.resolve($('<form>').append(input).asJsonData()), /Invalid form field name/);
+    assert.equal(dom.window.Object.getPrototypeOf(dom.window.Object.prototype), null);
 });
 
 test('modal target does not parse an HTML attribute as markup', () => {
