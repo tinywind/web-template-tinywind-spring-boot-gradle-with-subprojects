@@ -88,6 +88,7 @@ project(':webapp') {
         implementation project(':common-spring')
         implementation project(':spring-error-notifier')
         implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:4.1.0'
+        implementation 'org.mybatis:mybatis:3.6.0'
         implementation 'org.springframework.boot:spring-boot-starter-jdbc'
         implementation 'org.springframework.boot:spring-boot-starter-aspectj'
         implementation 'org.springframework.boot:spring-boot-starter-validation'
