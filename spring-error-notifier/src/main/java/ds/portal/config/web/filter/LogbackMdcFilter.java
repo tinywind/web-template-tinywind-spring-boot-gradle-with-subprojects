@@ -6,8 +6,8 @@ import ds.portal.web.request.RequestUtils;
 import eu.bitwalker.useragentutils.*;
 import org.springframework.web.util.UrlPathHelper;
 
-import javax.servlet.*;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.*;
+import jakarta.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.util.function.Predicate;
 

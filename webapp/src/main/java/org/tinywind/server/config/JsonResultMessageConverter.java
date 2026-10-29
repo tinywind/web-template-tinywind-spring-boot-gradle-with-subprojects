@@ -8,7 +8,7 @@ import org.springframework.http.HttpOutputMessage;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.stereotype.Component;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.List;
@@ -29,7 +29,12 @@ public class JsonResultMessageConverter extends MappingJackson2HttpMessageConver
     @SneakyThrows
     @Override
     protected void writeInternal(Object object, Type type, HttpOutputMessage outputMessage) {
-        if (excludingRequests.contains(request.getRequestURI())) {
+        if (request.getRequestURI().startsWith(request.getContextPath() + "/v3/api-docs")) {
+            if (object instanceof byte[] bytes)
+                outputMessage.getBody().write(bytes);
+            else
+                super.writeInternal(object, type, outputMessage);
+        } else if (excludingRequests.contains(request.getRequestURI())) {
             super.writeInternal(object, type, outputMessage);
         } else {
             super.writeInternal(JsonResult.data(object), type, outputMessage);

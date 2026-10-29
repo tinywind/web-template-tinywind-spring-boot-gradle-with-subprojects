@@ -31,7 +31,7 @@ public class PersistenceConfig {
         final SqlSessionFactoryBean factoryBean = new SqlSessionFactoryBean();
         factoryBean.setDataSource(dataSource);
         factoryBean.setConfiguration(MybatisConfig.createConfiguration());
-        factoryBean.setMapperLocations(applicationContext.getResources("classpath:kr/co/klnet/tbs/repository/u.xml"));
+        factoryBean.setMapperLocations(applicationContext.getResources("classpath:org/tinywind/server/repository/u.xml"));
         return factoryBean.getObject();
     }
 

@@ -13,55 +13,32 @@ import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
 
-import javax.annotation.PostConstruct;
-import javax.net.ssl.*;
+import jakarta.annotation.PostConstruct;
+import org.apache.hc.client5.http.config.ConnectionConfig;
+import org.apache.hc.client5.http.impl.classic.HttpClients;
+import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManagerBuilder;
+import org.apache.hc.client5.http.ssl.DefaultClientTlsStrategy;
+import org.apache.hc.core5.util.Timeout;
 import java.io.IOException;
 import java.nio.charset.Charset;
-import java.security.KeyManagementException;
-import java.security.NoSuchAlgorithmException;
-import java.security.cert.X509Certificate;
 import java.util.Map;
 
 @Slf4j
 public abstract class AbstractRestInterface {
-    static {
-        try {
-            // Create a trust manager that does not validate certificate chains
-            TrustManager[] trustAllCerts = new TrustManager[]{new X509TrustManager() {
-                public X509Certificate[] getAcceptedIssuers() {
-                    return null;
-                }
-
-                public void checkClientTrusted(X509Certificate[] certs, String authType) {
-                }
-
-                public void checkServerTrusted(X509Certificate[] certs, String authType) {
-                }
-            }
-            };
-
-            // Install the all-trusting trust manager
-            SSLContext sc = SSLContext.getInstance("SSL");
-            sc.init(null, trustAllCerts, new java.security.SecureRandom());
-            HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
-
-            // Create all-trusting host name verifier
-            HostnameVerifier allHostsValid = (hostname, session) -> true;
-
-            // Install the all-trusting host verifier
-            HttpsURLConnection.setDefaultHostnameVerifier(allHostsValid);
-        } catch (NoSuchAlgorithmException | KeyManagementException e) {
-            e.printStackTrace();
-        }
-    }
-
     @Autowired
     protected ObjectMapper objectMapper;
     protected TypeFactory typeFactory;
 
     protected static HttpComponentsClientHttpRequestFactory getClientHttpRequestFactory() {
-        final HttpComponentsClientHttpRequestFactory factory = new HttpComponentsClientHttpRequestFactory();
-        factory.setConnectTimeout(30 * 1000);
+        final var connections = PoolingHttpClientConnectionManagerBuilder.create()
+                .setDefaultConnectionConfig(ConnectionConfig.custom()
+                        .setConnectTimeout(Timeout.ofSeconds(30))
+                        .setSocketTimeout(Timeout.ofSeconds(30)).build())
+                .setTlsSocketStrategy(DefaultClientTlsStrategy.createSystemDefault())
+                .build();
+        final var client = HttpClients.custom().useSystemProperties().setConnectionManager(connections).build();
+        final HttpComponentsClientHttpRequestFactory factory = new HttpComponentsClientHttpRequestFactory(client);
+        factory.setConnectionRequestTimeout(30 * 1000);
         factory.setReadTimeout(30 * 1000);
         return factory;
     }
@@ -110,7 +87,7 @@ public abstract class AbstractRestInterface {
     }
 
     protected <BODY> Object call(String url, BODY o, JavaType javaType, HttpMethod method, boolean urlParam) throws HttpStatusCodeException, IOException {
-        final RestTemplate template = new RestTemplate(/*getFactory()*/);
+        final RestTemplate template = new RestTemplate(getClientHttpRequestFactory());
         @SuppressWarnings("unchecked") final Map<String, Object> params = (Map<String, Object>) objectMapper.convertValue(o, Map.class);
         template.getMessageConverters().add(0, new StringHttpMessageConverter(Charset.defaultCharset()));
 
@@ -153,7 +130,7 @@ public abstract class AbstractRestInterface {
     }
 
     protected <BODY, RESPONSE> RESPONSE call(String url, BODY o, Class<RESPONSE> klass, HttpMethod method, boolean urlParam) throws HttpStatusCodeException, IOException {
-        final RestTemplate template = new RestTemplate(/*getFactory()*/);
+        final RestTemplate template = new RestTemplate(getClientHttpRequestFactory());
         @SuppressWarnings("unchecked") final Map<String, Object> params = (Map<String, Object>) objectMapper.convertValue(o, Map.class);
         template.getMessageConverters().add(0, new StringHttpMessageConverter(Charset.defaultCharset()));
 

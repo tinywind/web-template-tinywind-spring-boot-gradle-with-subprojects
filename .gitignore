@@ -10,3 +10,5 @@ build/
 out/
 webapp/files/*
 lombok.config
+.tmp/
+node_modules/

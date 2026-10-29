@@ -1,8 +1,9 @@
 package org.tinywind.server.util;
 
-import java.io.BufferedInputStream;
 import java.io.IOException;
-import java.io.InputStream;
+import java.net.NetworkInterface;
+import java.util.Collections;
+import java.util.Locale;
 
 /**
  * MAC Address를 알아낸다. JDK 1.6 version에서는 MAC Address를 구하는 메소드를 제공하지만 그 전의 버전에서는
@@ -34,57 +35,21 @@ public final class NetworkInfo {
      * 현재 컴퓨터의 맥 주소를 리턴한다.
      */
     public static String getMacAddress() throws IOException {
-        String os = System.getProperty("os.name");
-
-        if (os.startsWith("Windows")) {
-            return ParseMacAddress(windowsRunIpConfigCommand());
-        } else if (os.startsWith("Linux")) {
-            return ParseMacAddress(linuxRunIfConfigCommand());
-        } else {
-            throw new IOException("unknown operating system: " + os);
+        for (NetworkInterface network : Collections.list(NetworkInterface.getNetworkInterfaces())) {
+            if (network.isLoopback())
+                continue;
+            byte[] address = network.getHardwareAddress();
+            if (address == null || address.length != 6)
+                continue;
+            StringBuilder result = new StringBuilder();
+            for (byte part : address) {
+                if (result.length() > 0)
+                    result.append('-');
+                result.append(String.format(Locale.ROOT, "%02X", part & 0xff));
+            }
+            return result.toString();
         }
-    }
-
-    /**
-     * Linux 에 있는 네트워크 설정 값들을 문자열로 불러온다.
-     */
-    private static String linuxRunIfConfigCommand() throws IOException {
-        Process p = Runtime.getRuntime().exec("ifconfig");
-        InputStream stdoutStream = new BufferedInputStream(p.getInputStream());
-
-        StringBuilder buffer = new StringBuilder();
-        for (; ; ) {
-            int c = stdoutStream.read();
-            if (c == -1)
-                break;
-            buffer.append((char) c);
-        }
-        String outputText = buffer.toString();
-
-        stdoutStream.close();
-
-        return outputText;
-    }
-
-    /**
-     * Windows에 있는 네트워크 설정값들을 문자열로 가져온다.
-     */
-    private static String windowsRunIpConfigCommand() throws IOException {
-        Process p = Runtime.getRuntime().exec("ipconfig /all");
-        InputStream stdoutStream = new BufferedInputStream(p.getInputStream());
-
-        StringBuilder buffer = new StringBuilder();
-        for (; ; ) {
-            int c = stdoutStream.read();
-            if (c == -1)
-                break;
-            buffer.append((char) c);
-        }
-        String outputText = buffer.toString();
-
-        stdoutStream.close();
-
-        return outputText;
+        throw new IOException("No hardware address is available");
     }
 
     /**

@@ -10,9 +10,10 @@ import org.springframework.stereotype.Service;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 import org.thymeleaf.templatemode.TemplateMode;
-import org.thymeleaf.templateresolver.ServletContextTemplateResolver;
+import org.thymeleaf.templateresolver.WebApplicationTemplateResolver;
+import org.thymeleaf.web.servlet.JakartaServletWebApplication;
 
-import javax.servlet.ServletContext;
+import jakarta.servlet.ServletContext;
 
 @Slf4j
 @Service
@@ -28,7 +29,8 @@ public class MailService extends BaseService {
         this.mailSender = mailSender;
         this.fileService = fileService;
 
-        final ServletContextTemplateResolver templateResolver = new ServletContextTemplateResolver(servletContext);
+        final WebApplicationTemplateResolver templateResolver = new WebApplicationTemplateResolver(
+                JakartaServletWebApplication.buildApplication(servletContext));
 
         templateResolver.setTemplateMode(TemplateMode.HTML);
         templateResolver.setPrefix("/mail/");

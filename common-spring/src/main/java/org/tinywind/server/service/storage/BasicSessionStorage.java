@@ -2,7 +2,7 @@ package org.tinywind.server.service.storage;
 
 import lombok.RequiredArgsConstructor;
 
-import javax.servlet.http.HttpSession;
+import jakarta.servlet.http.HttpSession;
 
 @RequiredArgsConstructor
 public class BasicSessionStorage implements SessionStorage {

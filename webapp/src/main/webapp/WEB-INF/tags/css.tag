@@ -17,7 +17,7 @@
 <!-- external library common -->
 
 <!-- external library depend -->
-<link href="<c:url value="/webjars/jquery-ui/1.12.1/jquery-ui.min.css"/>" rel="stylesheet"/>
+<link href="<c:url value="/webjars/jquery-ui/1.14.2/jquery-ui.min.css"/>" rel="stylesheet"/>
 
 <c:choose>
     <c:when test="${debugging}">

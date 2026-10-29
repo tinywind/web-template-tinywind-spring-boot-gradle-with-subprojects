@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestClientResponseException;
 
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.sql.SQLException;
@@ -72,8 +72,8 @@ public class ApiExceptionHandler {
     @ExceptionHandler(value = {HttpStatusCodeException.class})
     public void httpClientErrorException(HttpServletResponse response, RestClientResponseException e) throws IOException {
         response.setContentType(ContentType.APPLICATION_JSON.toString());
-        response.setStatus(e.getRawStatusCode());
-        if (e.getRawStatusCode() == HttpServletResponse.SC_UNAUTHORIZED)
+        response.setStatus(e.getStatusCode().value());
+        if (e.getStatusCode().value() == HttpServletResponse.SC_UNAUTHORIZED)
             JsonResult.create("API 서버 로그인이 필요합니다.");
 
         try {
@@ -102,8 +102,8 @@ public class ApiExceptionHandler {
         response.getWriter().print(objectMapper.writeValueAsString(jsonResult));
     }
 
-    @ExceptionHandler(javax.validation.ValidationException.class)
-    public void validationException(HttpServletResponse response, javax.validation.ValidationException e) throws IOException {
+    @ExceptionHandler(jakarta.validation.ValidationException.class)
+    public void validationException(HttpServletResponse response, jakarta.validation.ValidationException e) throws IOException {
         response.setContentType(ContentType.APPLICATION_JSON.toString());
         response.setStatus(HttpServletResponse.SC_PRECONDITION_FAILED);
         response.getWriter().print(objectMapper.writeValueAsString(JsonResult.create(e.getMessage())));

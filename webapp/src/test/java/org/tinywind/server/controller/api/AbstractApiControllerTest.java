@@ -11,7 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -20,6 +20,8 @@ import java.util.ArrayList;
 @Slf4j
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureMockMvc
+@org.springframework.test.context.ActiveProfiles("test")
+@org.springframework.context.annotation.Import(org.tinywind.server.IsolatedDatabaseConfig.class)
 public abstract class AbstractApiControllerTest {
     protected final ObjectMapper objectMapper = new ObjectMapper();
     protected final TypeFactory typeFactory = objectMapper.getTypeFactory();

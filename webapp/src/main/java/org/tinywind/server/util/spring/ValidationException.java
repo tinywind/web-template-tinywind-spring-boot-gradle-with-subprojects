@@ -4,7 +4,7 @@ import org.springframework.validation.BindingResult;
 
 import java.util.stream.Collectors;
 
-public class ValidationException extends javax.validation.ValidationException {
+public class ValidationException extends jakarta.validation.ValidationException {
     private final BindingResult bindingResult;
 
     public ValidationException(String message, BindingResult bindingResult) {

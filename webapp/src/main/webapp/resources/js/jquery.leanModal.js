@@ -117,7 +117,13 @@
                 }
 
                 const href = $(this).attr("href");
-                const modal = $(href != null ? href : $(this).attr('data-href'));
+                const target = href != null ? href : $(this).attr('data-href');
+                if (typeof target !== 'string' || !target.startsWith('#') || target.length < 2)
+                    return;
+                const element = document.getElementById(target.substring(1));
+                if (!element)
+                    return;
+                const modal = $(element);
                 modal.detach().appendTo(overlayContainer);
 
                 if (modal.css('position') === 'fixed') {

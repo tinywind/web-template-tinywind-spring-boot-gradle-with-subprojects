@@ -1,0 +1,30 @@
+spring:
+  mail:
+    host: 127.0.0.1
+    port: 25252
+    username: template-test
+    password: isolated-smtp-fixture
+  web:
+    resources:
+      static-locations: classpath:/META-INF/resources/, file:src/main/webapp/
+springdoc:
+  api-docs:
+    enabled: true
+  swagger-ui:
+    enabled: true
+user-data:
+  mail:
+    from: template@example.invalid
+  application:
+    file:
+      location: ${java.io.tmpdir}/stored-files
+  datasource:
+    jdbc-url: jdbc:h2:mem:template-primary;MODE=Oracle;DB_CLOSE_DELAY=-1;BUILTIN_ALIAS_OVERRIDE=TRUE
+    driver-class-name: org.h2.Driver
+    username: template_test
+    password: isolated-primary-fixture
+    secondary:
+      jdbc-url: jdbc:h2:mem:template-secondary;MODE=Oracle;DB_CLOSE_DELAY=-1;BUILTIN_ALIAS_OVERRIDE=TRUE
+      driver-class-name: org.h2.Driver
+      username: template_test
+      password: isolated-secondary-fixture

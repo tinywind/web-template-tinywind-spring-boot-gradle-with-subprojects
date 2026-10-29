@@ -32,7 +32,7 @@ public class SecondaryPersistenceConfig {
         SqlSessionFactoryBean factoryBean = new SqlSessionFactoryBean();
         factoryBean.setDataSource(secondaryDataSource);
         factoryBean.setConfiguration(MybatisConfig.createConfiguration());
-        factoryBean.setMapperLocations(applicationContext.getResources("classpath:kr/co/klnet/tbs/repository/u.xml"));
+        factoryBean.setMapperLocations(applicationContext.getResources("classpath:org/tinywind/server/repository/u.xml"));
         return factoryBean.getObject();
     }
 

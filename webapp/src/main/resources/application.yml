@@ -24,10 +24,10 @@ spring:
       max-request-size: 100MB
       max-file-size: 100MB
   mail:
-    host:
-    port:
-    username:
-    password:
+    host: ${SMTP_HOST}
+    port: ${SMTP_PORT}
+    username: ${SMTP_USERNAME}
+    password: ${SMTP_PASSWORD}
     properties:
       mail:
         smtp:
@@ -49,6 +49,12 @@ application:
     service: ${spring.application.name}
     endpoint_url: http://localhost:8082/endpoint
 # 정의 설정
+springdoc:
+  api-docs:
+    enabled: ${user-data.application.debugging}
+  swagger-ui:
+    enabled: ${user-data.application.debugging}
+    path: /swagger-ui.html
 user-data:
   mail:
     from:
@@ -61,14 +67,14 @@ user-data:
       location: ./files
   datasource:
     #    jdbc-url: jdbc:oracle:thin:@localhost:1521:orcl
-    jdbc-url: jdbc:log4jdbc:oracle:thin:@localhost:1521:orcl
+    jdbc-url: ${JDBC_URL}
     #    driver-class-name: oracle.jdbc.OracleDriver
     driver-class-name: net.sf.log4jdbc.sql.jdbcapi.DriverSpy
-    username: database_username
-    password: database_password
+    username: ${JDBC_USERNAME}
+    password: ${JDBC_PASSWORD}
 # 두번째 datasource가 적용되는지 확인
     secondary:
-      jdbc-url: ${user-data.datasource.jdbc-url}
+      jdbc-url: ${SECONDARY_JDBC_URL}
       driver-class-name: ${user-data.datasource.driver-class-name}
-      username: ${user-data.datasource.username}
-      password: ${user-data.datasource.password}
+      username: ${SECONDARY_JDBC_USERNAME}
+      password: ${SECONDARY_JDBC_PASSWORD}
