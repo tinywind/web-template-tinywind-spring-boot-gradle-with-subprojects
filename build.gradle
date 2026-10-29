@@ -76,7 +76,7 @@ configure([project(':common-spring'), project(':spring-error-notifier')]) {
 
 project(':common-spring') {
     dependencies {
-        api 'io.vavr:vavr:0.10.7'
+        api 'io.vavr:vavr:1.1.0'
         api 'io.vavr:vavr-jackson:0.10.3'
     }
 }
