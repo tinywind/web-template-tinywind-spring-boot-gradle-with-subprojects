@@ -7,13 +7,13 @@ import org.tinywind.server.util.JsonResult;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.entity.ContentType;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
+import org.springframework.web.servlet.HandlerInterceptor;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-public class BaseHandlerInterceptorAdapter extends HandlerInterceptorAdapter {
+public class BaseHandlerInterceptorAdapter implements HandlerInterceptor {
     @Autowired
     protected RequestGlobal g;
     @Autowired

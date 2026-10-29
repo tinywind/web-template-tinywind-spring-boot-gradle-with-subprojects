@@ -166,7 +166,7 @@ public abstract class ApiServerInterface extends AbstractRestInterface {
         if (info != null)
             setAuthorization(headers, info);
 
-        final UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromHttpUrl(url);
+        final UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUriString(url);
 
         String paramString;
         try {

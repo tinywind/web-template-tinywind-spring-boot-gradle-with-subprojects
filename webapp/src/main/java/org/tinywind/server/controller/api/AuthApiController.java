@@ -10,7 +10,7 @@ import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 
 @AllArgsConstructor
 @RestController

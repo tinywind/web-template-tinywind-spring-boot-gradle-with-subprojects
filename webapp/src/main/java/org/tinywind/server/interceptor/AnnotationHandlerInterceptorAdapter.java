@@ -3,8 +3,8 @@ package org.tinywind.server.interceptor;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.web.method.HandlerMethod;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import java.lang.annotation.Annotation;
 
 public class AnnotationHandlerInterceptorAdapter<T extends Annotation> extends BaseHandlerInterceptorAdapter {

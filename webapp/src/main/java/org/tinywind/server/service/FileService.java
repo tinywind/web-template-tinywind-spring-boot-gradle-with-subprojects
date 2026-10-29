@@ -6,14 +6,17 @@ import org.tinywind.server.model.form.FileUploadForm;
 import org.tinywind.server.repository.FileRepository;
 import org.tinywind.server.util.UrlUtils;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.binary.Base64;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
-import java.io.FileOutputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
+import java.nio.file.LinkOption;
+import org.tinywind.server.util.StoredFilePaths;
 import java.io.IOException;
 import java.util.UUID;
 
@@ -21,7 +24,6 @@ import java.util.UUID;
  * @author tinywind
  * @since 2018-01-14
  */
-@Slf4j
 @RequiredArgsConstructor
 @Service
 public class FileService extends BaseService {
@@ -59,26 +61,20 @@ public class FileService extends BaseService {
     }
 
     public UUID save(String fileName, byte[] bytes) throws IOException {
-        final File fileDirectory = new File(fileLocation);
-        if (!fileDirectory.exists()) {
-            fileDirectory.mkdirs();
-            log.info("create fileLocation: " + fileDirectory.getAbsolutePath());
-        }
-
-        final String filePath = System.currentTimeMillis() + "_" + System.nanoTime() + "_" + fileName;
-        final File file = new File(fileLocation, filePath);
-        try (final FileOutputStream writer = new FileOutputStream(file)) {
+        StoredFilePaths.validateName(fileName);
+        final Path directory = Path.of(fileLocation).toAbsolutePath().normalize();
+        Files.createDirectories(directory);
+        final String filePath = UUID.randomUUID() + "_" + fileName;
+        final Path file = StoredFilePaths.resolve(fileLocation, filePath);
+        try (final java.io.OutputStream writer = Files.newOutputStream(file,
+                StandardOpenOption.CREATE_NEW, StandardOpenOption.WRITE, LinkOption.NOFOLLOW_LINKS)) {
             writer.write(bytes);
             writer.flush();
-
             final FileForm form = new FileForm(fileName, filePath, (long) bytes.length);
             fileRepository.insert(form);
             return form.getId();
-        } catch (IOException e) {
-            log.error(e.getMessage(), e);
-            boolean deleted = file.delete();
-            if (!deleted) log.error("Failed: delete file: " + file.getAbsolutePath());
-
+        } catch (IOException | RuntimeException e) {
+            Files.deleteIfExists(file);
             throw e;
         }
     }
@@ -92,15 +88,15 @@ public class FileService extends BaseService {
     }
 
     public File file(String path) {
-        return new File(fileLocation, path);
+        return StoredFilePaths.resolve(fileLocation, path).toFile();
     }
 
     public File file(UUID id) {
         final FileEntity file = fileRepository.findOne(id);
-        return new File(fileLocation, file.getPath());
+        return file(file.getPath());
     }
 
     public File file(FileEntity file) {
-        return new File(fileLocation, file.getPath());
+        return file(file.getPath());
     }
 }

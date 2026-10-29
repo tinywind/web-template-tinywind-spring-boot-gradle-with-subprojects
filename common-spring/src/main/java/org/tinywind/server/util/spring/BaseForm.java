@@ -5,7 +5,7 @@ import org.springframework.validation.BindingResult;
 
 public abstract class BaseForm {
     public static final String NOT_BLANK = "org.hibernate.validator.constraints.NotBlank.message";
-    public static final String NOT_NULL = "javax.validation.constraints.NotNull.message";
+    public static final String NOT_NULL = "jakarta.validation.constraints.NotNull.message";
 
     public static void reject(BindingResult result, String field, String message, Object... objects) {
 

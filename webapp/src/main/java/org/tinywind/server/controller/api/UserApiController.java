@@ -11,7 +11,7 @@ import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 import java.util.List;
 import java.util.UUID;
 
@@ -21,7 +21,7 @@ import java.util.UUID;
 public class UserApiController extends BaseController {
     private final UserRepository repository;
 
-    @GetMapping("")
+    @GetMapping({"", "/"})
     public Pagination<User> pagination(UserSearch search) {
         return new Pagination<>(repository.search(search), repository.count(search), search.getPage(), search.getLimit());
     }
@@ -38,7 +38,7 @@ public class UserApiController extends BaseController {
         return repository.findOne(id);
     }
 
-    @PostMapping("")
+    @PostMapping({"", "/"})
     public UUID post(@Valid @RequestBody UserForm form, BindingResult bindingResult) {
         form.setPassword(BCrypt.hashpw(form.getPassword(), BCrypt.gensalt()));
         repository.insert(form);

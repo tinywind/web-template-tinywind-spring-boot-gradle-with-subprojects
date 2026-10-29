@@ -38,11 +38,11 @@ public class UuidHandler implements TypeHandler<UUID> {
             return null;
 
         return UUID.fromString(
-                value.substring(0, 7)
-                        + "-" + value.substring(8, 11)
-                        + "-" + value.substring(12, 15)
-                        + "-" + value.substring(16, 19)
-                        + "-" + value.substring(20, 31)
+                value.substring(0, 8)
+                        + "-" + value.substring(8, 12)
+                        + "-" + value.substring(12, 16)
+                        + "-" + value.substring(16, 20)
+                        + "-" + value.substring(20, 32)
         );
     }
 }

@@ -3,7 +3,7 @@ package ds.portal.config;
 import org.springframework.boot.actuate.autoconfigure.endpoint.web.WebEndpointProperties;
 import org.springframework.web.util.UrlPathHelper;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 public abstract class AbstractFilterConfig {
     protected final WebEndpointProperties webEndpointProperties;
