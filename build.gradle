@@ -62,14 +62,14 @@ configure([project(':common-spring'), project(':spring-error-notifier')]) {
     bootJar { enabled = false }
     jar { enabled = true }
     dependencies {
-        implementation 'net.rakugakibox.util:yaml-resource-bundle:1.1'
+        implementation 'net.rakugakibox.util:yaml-resource-bundle:1.4'
         api 'org.springframework:spring-webmvc'
         implementation 'org.springframework.boot:spring-boot'
         implementation 'org.springframework.boot:spring-boot-web-server'
         implementation 'org.springframework.boot:spring-boot-actuator-autoconfigure'
         api 'com.fasterxml.jackson.core:jackson-databind'
         implementation 'eu.bitwalker:UserAgentUtils:1.21'
-        implementation 'com.squareup.okhttp3:okhttp:5.3.2'
+        implementation 'com.squareup.okhttp3:okhttp:5.5.1'
         compileOnly 'jakarta.servlet:jakarta.servlet-api'
     }
 }
@@ -101,7 +101,7 @@ project(':webapp') {
         implementation 'org.apache.tomcat.embed:tomcat-embed-jasper'
         implementation 'jakarta.servlet.jsp.jstl:jakarta.servlet.jsp.jstl-api'
         implementation 'org.glassfish.web:jakarta.servlet.jsp.jstl'
-        implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:3.0.2'
+        implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:3.2.0'
         implementation 'io.swagger:swagger-annotations:1.6.16'
         implementation 'org.apache.httpcomponents:httpcore:4.4.16'
         implementation 'org.apache.httpcomponents:httpclient:4.5.14'
