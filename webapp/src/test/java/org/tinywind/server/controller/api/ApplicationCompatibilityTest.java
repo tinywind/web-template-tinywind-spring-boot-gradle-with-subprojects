@@ -52,6 +52,10 @@ class ApplicationCompatibilityTest extends AbstractApiControllerTest {
         var docs = get(client, "/v3/api-docs/application");
         assertEquals(200, docs.statusCode(), docs.body());
         assertTrue(objectMapper.readTree(docs.body()).has("openapi"), docs.body());
+        var config = get(client, "/v3/api-docs/swagger-config");
+        assertEquals(200, config.statusCode(), config.body());
+        assertTrue(objectMapper.readTree(config.body()).has("urls"), config.body());
+        assertEquals(200, get(client, "/swagger-ui/index.html").statusCode());
     }
 
     @Test void keepsLoginSessionAndLogsOut() throws Exception {

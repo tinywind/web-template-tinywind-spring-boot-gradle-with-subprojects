@@ -8,12 +8,17 @@ import org.tinywind.server.util.UrlUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
-import org.springframework.http.client.SimpleClientHttpRequestFactory;
+import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
 
 import jakarta.annotation.PostConstruct;
+import org.apache.hc.client5.http.config.ConnectionConfig;
+import org.apache.hc.client5.http.impl.classic.HttpClients;
+import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManagerBuilder;
+import org.apache.hc.client5.http.ssl.DefaultClientTlsStrategy;
+import org.apache.hc.core5.util.Timeout;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.Map;
@@ -24,9 +29,16 @@ public abstract class AbstractRestInterface {
     protected ObjectMapper objectMapper;
     protected TypeFactory typeFactory;
 
-    protected static SimpleClientHttpRequestFactory getClientHttpRequestFactory() {
-        final SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
-        factory.setConnectTimeout(30 * 1000);
+    protected static HttpComponentsClientHttpRequestFactory getClientHttpRequestFactory() {
+        final var connections = PoolingHttpClientConnectionManagerBuilder.create()
+                .setDefaultConnectionConfig(ConnectionConfig.custom()
+                        .setConnectTimeout(Timeout.ofSeconds(30))
+                        .setSocketTimeout(Timeout.ofSeconds(30)).build())
+                .setTlsSocketStrategy(DefaultClientTlsStrategy.createSystemDefault())
+                .build();
+        final var client = HttpClients.custom().useSystemProperties().setConnectionManager(connections).build();
+        final HttpComponentsClientHttpRequestFactory factory = new HttpComponentsClientHttpRequestFactory(client);
+        factory.setConnectionRequestTimeout(30 * 1000);
         factory.setReadTimeout(30 * 1000);
         return factory;
     }
@@ -75,7 +87,7 @@ public abstract class AbstractRestInterface {
     }
 
     protected <BODY> Object call(String url, BODY o, JavaType javaType, HttpMethod method, boolean urlParam) throws HttpStatusCodeException, IOException {
-        final RestTemplate template = new RestTemplate(/*getFactory()*/);
+        final RestTemplate template = new RestTemplate(getClientHttpRequestFactory());
         @SuppressWarnings("unchecked") final Map<String, Object> params = (Map<String, Object>) objectMapper.convertValue(o, Map.class);
         template.getMessageConverters().add(0, new StringHttpMessageConverter(Charset.defaultCharset()));
 
@@ -118,7 +130,7 @@ public abstract class AbstractRestInterface {
     }
 
     protected <BODY, RESPONSE> RESPONSE call(String url, BODY o, Class<RESPONSE> klass, HttpMethod method, boolean urlParam) throws HttpStatusCodeException, IOException {
-        final RestTemplate template = new RestTemplate(/*getFactory()*/);
+        final RestTemplate template = new RestTemplate(getClientHttpRequestFactory());
         @SuppressWarnings("unchecked") final Map<String, Object> params = (Map<String, Object>) objectMapper.convertValue(o, Map.class);
         template.getMessageConverters().add(0, new StringHttpMessageConverter(Charset.defaultCharset()));
 

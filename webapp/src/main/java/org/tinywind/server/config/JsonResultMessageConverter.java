@@ -29,8 +29,11 @@ public class JsonResultMessageConverter extends MappingJackson2HttpMessageConver
     @SneakyThrows
     @Override
     protected void writeInternal(Object object, Type type, HttpOutputMessage outputMessage) {
-        if (request.getRequestURI().startsWith(request.getContextPath() + "/v3/api-docs") && object instanceof byte[] bytes) {
-            outputMessage.getBody().write(bytes);
+        if (request.getRequestURI().startsWith(request.getContextPath() + "/v3/api-docs")) {
+            if (object instanceof byte[] bytes)
+                outputMessage.getBody().write(bytes);
+            else
+                super.writeInternal(object, type, outputMessage);
         } else if (excludingRequests.contains(request.getRequestURI())) {
             super.writeInternal(object, type, outputMessage);
         } else {

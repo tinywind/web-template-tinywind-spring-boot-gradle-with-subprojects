@@ -6,7 +6,8 @@ import com.sun.net.httpserver.HttpsServer;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.springframework.web.client.ResourceAccessException;
-import org.tinywind.server.service.AbstractRestInterface;
+import org.tinywind.server.service.api.ApiServerInterface;
+import org.springframework.http.HttpHeaders;
 
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.KeyManagerFactory;
@@ -24,9 +25,14 @@ import static org.junit.jupiter.api.Assertions.*;
 class HttpsTransportSecurityTest {
     @TempDir Path temporary;
 
-    static class Client extends AbstractRestInterface {
+    static class Client extends ApiServerInterface {
         Client() { objectMapper = new ObjectMapper(); setup(); }
-        Object request(String url) throws Exception { return get(url, Map.of(), Map.class); }
+        Object request(String url) throws Exception {
+            apiServerUrl = url;
+            return get("", Map.of(), Map.class);
+        }
+        @Override protected <INFO> INFO getAuthorization() { return null; }
+        @Override protected <INFO> void setAuthorization(HttpHeaders headers, INFO info) { }
     }
 
     @Test void acceptsTrustedCertificateAndRejectsUnknownIssuerAndWrongHost() throws Exception {
@@ -54,6 +60,7 @@ class HttpsTransportSecurityTest {
         });
         server.start();
         var original = HttpsURLConnection.getDefaultSSLSocketFactory();
+        var originalContext = SSLContext.getDefault();
         try {
             Client client = new Client();
             String trustedHost = "https://localhost:" + server.getAddress().getPort() + "/";
@@ -66,11 +73,13 @@ class HttpsTransportSecurityTest {
             SSLContext trusted = SSLContext.getInstance("TLS");
             trusted.init(null, trustManagers.getTrustManagers(), null);
             HttpsURLConnection.setDefaultSSLSocketFactory(trusted.getSocketFactory());
+            SSLContext.setDefault(trusted);
             assertEquals(Map.of("accepted", true), client.request(trustedHost));
             assertThrows(ResourceAccessException.class,
                     () -> client.request("https://127.0.0.1:" + server.getAddress().getPort() + "/"));
         } finally {
             HttpsURLConnection.setDefaultSSLSocketFactory(original);
+            SSLContext.setDefault(originalContext);
             server.stop(0);
         }
     }
