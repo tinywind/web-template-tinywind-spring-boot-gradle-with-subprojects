@@ -62,7 +62,7 @@ configure([project(':common-spring'), project(':spring-error-notifier')]) {
     bootJar { enabled = false }
     jar { enabled = true }
     dependencies {
-        implementation 'net.rakugakibox.util:yaml-resource-bundle:1.1'
+        implementation 'net.rakugakibox.util:yaml-resource-bundle:1.4'
         api 'org.springframework:spring-webmvc'
         implementation 'org.springframework.boot:spring-boot'
         implementation 'org.springframework.boot:spring-boot-web-server'
