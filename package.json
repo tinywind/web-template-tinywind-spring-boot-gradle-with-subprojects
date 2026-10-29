@@ -1,0 +1,6 @@
+{
+  "name": "spring-template-web-security-tests",
+  "private": true,
+  "scripts": {"test": "node --test webapp/src/test/js/*.test.cjs"},
+  "devDependencies": {"jquery": "3.7.1", "jsdom": "27.4.0"}
+}

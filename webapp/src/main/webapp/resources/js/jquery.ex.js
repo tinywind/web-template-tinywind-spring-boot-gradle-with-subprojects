@@ -341,6 +341,11 @@
 
         function set(name, multiple, value) {
             const members = name.split('.');
+            if (members.some(member => member.split(/[\[\]]/).some(key =>
+                key === '__proto__' || key === 'constructor' || key === 'prototype'))) {
+                deferred.reject(new Error('Invalid form field name'));
+                return;
+            }
 
             for (let target = data, i = 0; i < members.length; i++) {
                 const last = i === members.length - 1;
@@ -349,14 +354,14 @@
                 if (checkMap) {
                     const key = checkMap[1];
                     const attr = checkMap[2];
-                    if (target[key] === undefined) target[key] = {};
+                    if (!Object.prototype.hasOwnProperty.call(target, key)) target[key] = {};
                     target = target[key];
                     if (last) {
                         if (multiple) if (!target[attr]) target[attr] = [];
                         if (multiple) target[attr].push(value);
                         else target[attr] = value;
                     } else {
-                        if (target[attr] === undefined) target[attr] = {};
+                        if (!Object.prototype.hasOwnProperty.call(target, attr)) target[attr] = {};
                         target = target[attr];
                     }
                 } else {
@@ -365,7 +370,7 @@
                         if (multiple) target[member].push(value);
                         else target[member] = value;
                     } else {
-                        if (target[member] === undefined) target[member] = {};
+                        if (!Object.prototype.hasOwnProperty.call(target, member)) target[member] = {};
                         target = target[member];
                     }
                 }
