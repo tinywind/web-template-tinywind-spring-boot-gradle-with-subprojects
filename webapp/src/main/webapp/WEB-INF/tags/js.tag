@@ -16,9 +16,9 @@
 
 <!-- external library common -->
 <script src="<c:url value="/webjars/jquery/3.7.1/jquery.min.js"/>"></script>
-<script src="<c:url value="/webjars/jquery-blockui/2.65/jquery.blockUI.js"/>"></script>
+<script src="<c:url value="/webjars/jquery-blockui/2.70/jquery.blockUI.js"/>"></script>
 <script src="<c:url value="/webjars/momentjs/2.31.0/moment.min.js"/>"></script>
-<script src="<c:url value="/webjars/d3js/5.16.0/d3.min.js"/>"></script>
+<script src="<c:url value="/webjars/d3js/6.7.0/d3.min.js"/>"></script>
 
 <!-- external library depend -->
 <script src="<c:url value="/webjars/jquery-ui/1.14.2/jquery-ui.min.js"/>"></script>

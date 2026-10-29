@@ -69,14 +69,14 @@ configure([project(':common-spring'), project(':spring-error-notifier')]) {
         implementation 'org.springframework.boot:spring-boot-actuator-autoconfigure'
         api 'com.fasterxml.jackson.core:jackson-databind'
         implementation 'eu.bitwalker:UserAgentUtils:1.21'
-        implementation 'com.squareup.okhttp3:okhttp:5.3.2'
+        implementation 'com.squareup.okhttp3:okhttp:5.5.1'
         compileOnly 'jakarta.servlet:jakarta.servlet-api'
     }
 }
 
 project(':common-spring') {
     dependencies {
-        api 'io.vavr:vavr:0.10.7'
+        api 'io.vavr:vavr:1.1.0'
         api 'io.vavr:vavr-jackson:0.10.3'
     }
 }
@@ -101,7 +101,7 @@ project(':webapp') {
         implementation 'org.apache.tomcat.embed:tomcat-embed-jasper'
         implementation 'jakarta.servlet.jsp.jstl:jakarta.servlet.jsp.jstl-api'
         implementation 'org.glassfish.web:jakarta.servlet.jsp.jstl'
-        implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:3.0.2'
+        implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:3.2.0'
         implementation 'io.swagger:swagger-annotations:1.6.16'
         implementation 'org.apache.httpcomponents:httpcore:4.4.16'
         implementation 'org.apache.httpcomponents:httpclient:4.5.14'
@@ -109,12 +109,12 @@ project(':webapp') {
         implementation 'org.mindrot:jbcrypt:0.4'
         implementation 'commons-fileupload:commons-fileupload:1.6.0'
         implementation 'commons-io:commons-io:2.22.0'
-        implementation 'org.apache.poi:poi:5.5.1'
-        implementation 'org.apache.poi:poi-ooxml:5.5.1'
+        implementation 'org.apache.poi:poi:6.0.0'
+        implementation 'org.apache.poi:poi-ooxml:6.0.0'
         implementation 'org.webjars:jquery:3.7.1'
-        implementation 'org.webjars:jquery-blockui:2.65'
+        implementation 'org.webjars:jquery-blockui:2.70-1'
         implementation 'org.webjars:momentjs:2.31.0'
-        implementation 'org.webjars:d3js:5.16.0'
+        implementation 'org.webjars:d3js:6.7.0'
         implementation 'org.webjars.bower:less.js:2.7.3'
         implementation 'org.webjars:jquery-ui:1.14.2'
         implementation 'org.bgee.log4jdbc-log4j2:log4jdbc-log4j2-jdbc4.1:1.16'
