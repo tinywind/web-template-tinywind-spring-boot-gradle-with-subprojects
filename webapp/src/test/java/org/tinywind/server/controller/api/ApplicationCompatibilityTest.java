@@ -98,6 +98,31 @@ class ApplicationCompatibilityTest extends AbstractApiControllerTest {
         }
     }
 
+    @Test void uploadsMultipartFileAndKeepsSecondaryFileListingIndependent() throws Exception {
+        String boundary = "template-fixture-boundary";
+        String body = "--" + boundary + "\r\nContent-Disposition: form-data; name=\"file\"; filename=\"upload.txt\"\r\n"
+                + "Content-Type: application/octet-stream\r\n\r\nupload-content\r\n--" + boundary + "--\r\n";
+        HttpClient client = HttpClient.newHttpClient();
+        var response = client.send(HttpRequest.newBuilder(URI.create("http://127.0.0.1:" + port + "/api/files"))
+                .header("Content-Type", "multipart/form-data; boundary=" + boundary)
+                .POST(HttpRequest.BodyPublishers.ofString(body)).build(), HttpResponse.BodyHandlers.ofString());
+        assertEquals(200, response.statusCode(), response.body());
+        var file = objectMapper.readTree(response.body()).path("data");
+        String path = file.path("path").asText();
+        String id = file.path("id").asText();
+        try {
+            assertEquals("upload.txt", file.path("originalName").asText());
+            assertEquals(14, file.path("size").asLong());
+            assertEquals("upload-content", get(client, files.url(path)).body());
+            var other = get(client, "/api/__secondary/files");
+            assertEquals(200, other.statusCode(), other.body());
+            assertEquals(0, objectMapper.readTree(other.body()).path("data").size(), other.body());
+        } finally {
+            new JdbcTemplate(primary).update("DELETE FROM \"file\" WHERE \"id\" = ?", id.replace("-", "").toUpperCase(java.util.Locale.ROOT));
+            Files.deleteIfExists(files.file(path).toPath());
+        }
+    }
+
     @Test void keepsIndependentDatasourcesAndTransactions() {
         JdbcTemplate first = new JdbcTemplate(primary);
         JdbcTemplate second = new JdbcTemplate(secondary);

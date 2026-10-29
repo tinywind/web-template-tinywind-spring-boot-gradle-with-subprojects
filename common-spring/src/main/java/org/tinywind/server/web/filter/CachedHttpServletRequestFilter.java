@@ -21,7 +21,9 @@ public class CachedHttpServletRequestFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(@NotNull HttpServletRequest request, @NotNull HttpServletResponse response, @NotNull FilterChain filterChain) throws ServletException, IOException {
-        if (!excluded.test(request)) {
+        final String contentType = request.getContentType();
+        final boolean multipart = contentType != null && contentType.regionMatches(true, 0, "multipart/", 0, 10);
+        if (!excluded.test(request) && !multipart) {
             CachedHttpServletRequest cachedBodyHttpServletRequest = new CachedHttpServletRequest(request);
             filterChain.doFilter(cachedBodyHttpServletRequest, response);
         } else {
